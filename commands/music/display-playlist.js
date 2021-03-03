@@ -53,9 +53,9 @@ module.exports = class CreatePlaylistCommand extends Command {
         .setArray(urlsArrayClone)
         .setAuthorizedUsers([message.member.id])
         .setChannel(message.channel)
-        .setElementsPerPage(8)
+        .setElementsPerPage(10)
         .formatField('# - Title', function(e) {
-          return `**${urlsArrayClone.indexOf(e) + 1}**: [${e.title}](${e.url})`;
+          return `**${urlsArrayClone.indexOf(e) + 1}**: ${e.title}`;
         });
       savedSongsEmbed.embed.setColor('#ff7373').setTitle('Saved Songs');
       savedSongsEmbed.build();

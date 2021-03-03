@@ -34,10 +34,10 @@ module.exports = class MusicTriviaCommand extends Command {
   async run(message, { numberOfSongs }) {
     // check if user is in a voice channel
     var voiceChannel = message.member.voice.channel;
-    if (!voiceChannel) {
-      message.reply(':no_entry: Please join a voice channel and try again!');
-      return;
-    }
+    if (!voiceChannel)
+      return message.reply(
+        ':no_entry: Please join a voice channel and try again!'
+      );
     if (message.guild.musicData.isPlaying === true)
       return message.channel.send(':x: A quiz or a song is already running!');
     message.guild.musicData.isPlaying = true;
@@ -61,7 +61,7 @@ module.exports = class MusicTriviaCommand extends Command {
         `:notes: Get ready! There are ${numberOfSongs} songs, you have 30 seconds to guess either the singer/band or the name of the song. Good luck!
         You can end the trivia at any point by using the ${prefix}end-trivia command!`
       );
-    message.channel.send(infoEmbed);
+    message.reply(infoEmbed);
     // init quiz queue
     // turn each vid to song object
 
@@ -331,12 +331,12 @@ module.exports = class MusicTriviaCommand extends Command {
     if (!arr[0]) return; // issue #422
     let leaderBoard = '';
 
-    leaderBoard = `👑   **${arr[0][0]}:** ${arr[0][1]}  points`;
+    leaderBoard = `<:759640051709116418:813485587394068481>   **${arr[0][0]}:** ${arr[0][1]}  points`;
 
     if (arr.length > 1) {
       for (let i = 1; i < arr.length; i++) {
         leaderBoard =
-          leaderBoard + `\n\n   ${i + 1}: ${arr[i][0]}: ${arr[i][1]}  points`;
+          leaderBoard + `\n\n   **${i + 1}: ${arr[i][0]}:** ${arr[i][1]}  points`;
       }
     }
     return leaderBoard;

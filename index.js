@@ -1,9 +1,13 @@
 const { CommandoClient } = require('discord.js-commando');
+const Discord = require('discord.js')
 const { Structures, MessageEmbed, MessageAttachment } = require('discord.js');
 const path = require('path');
 const { prefix, token, discord_owner_id } = require('./config.json');
 const db = require('quick.db');
-const Canvas = require('canvas');
+const SnakeGame = require('./snake-game');
+const HangmanGame = require('./hangman-game');
+const Connect4 = require('./connect4');
+const Chess = require('./chess');
 
 Structures.extend('Guild', function(Guild) {
   class MusicGuild extends Guild {
@@ -26,6 +30,14 @@ Structures.extend('Guild', function(Guild) {
         triviaScore: new Map()
       };
     }
+    resetMusicDataOnError() {
+      this.musicData.queue.length = 0;
+      this.musicData.isPlaying = false;
+      this.musicData.nowPlaying = null;
+      this.musicData.loopSong = false;
+      this.musicData.loopQueue = false;
+      this.musicData.songDispatcher = null;
+    }
   }
   return MusicGuild;
 });
@@ -34,6 +46,11 @@ const client = new CommandoClient({
   commandPrefix: prefix,
   owner: discord_owner_id
 });
+
+const snakeGame = new SnakeGame(client);
+const hangman = new HangmanGame(client);
+const connect4 = new Connect4(client);
+const chess = new Chess(client);
 
 client.registry
   .registerDefaultTypes()
@@ -45,26 +62,18 @@ client.registry
     ['speedrun', ':athletic_shoe: Speedrun Related Commands:']
   ])
   .registerDefaultGroups()
-  .registerDefaultCommands({
-    eval: false,
-    prefix: false,
-    commandState: false
-  })
+  .registerDefaultCommands({ eval: false, prefix: false, commandState: false, help: false, unknownCommand: false })
   .registerCommandsIn(path.join(__dirname, 'commands'));
 
 client.once('ready', () => {
-  console.log(`${client.user.tag} is Ready!`);
+  console.log(`${client.user.tag} is connected to Discord successfully!`);
   client.user.setActivity(`${prefix}help`, {
-    type: 'WATCHING',
-    url: 'https://github.com/galnir/Master-Bot'
-  });
-  const Guilds = client.guilds.cache.map(guild => guild.name);
-  console.log(Guilds, 'Connected!');
-  // Registering font For Cloud Services
-  Canvas.registerFont('./resources/welcome/OpenSans-Light.ttf', {
-    family: 'Open Sans Light'
+    type: 'STREAMING',
+    url: 'https://www.twitch.tv/jriskam'
   });
 });
+
+
 client.on('voiceStateUpdate', async (___, newState) => {
   if (
     newState.member.user.bot &&
@@ -86,158 +95,151 @@ client.on('voiceStateUpdate', async (___, newState) => {
   }
 });
 
-client.on('guildMemberAdd', async member => {
-  //Grab DB 1 get
-  const serverSettingsFetch = db.get(member.guild.id);
-  if (!serverSettingsFetch || serverSettingsFetch == null) return;
+client.on('guildCreate', guild => {
+  let channelID
+      let channels = guild.channels.cache
+      channelLoop:
+      for (let c of channels) {
+        let channelType = c[1].type
+        if (channelType === "text") {
+            channelID = c[0]
+            break channelLoop
+          }
+      }  
+      let channel = client.channels.cache.get(guild.systemChannelID || channelID)
 
-  const welcomeMsgSettings = serverSettingsFetch.serverSettings.welcomeMsg;
-  if (welcomeMsgSettings == undefined) return;
+      channel.send(new Discord.MessageEmbed()
+      .setTitle("Thanks for adding me into your server!!")
+      .addField('**_Bunch Discord Bot_** <:Bunch:782263094008872981>','To get started, join a voice channel and `/play` a song! You can use song names, video links, and playlist links. A full list of commands is available [here](https://docs.google.com/document/d/1cRUb67XddISl5qJEl4ag5aOAyMEHNBC9w_3t2LFvXrk/edit?usp=sharing) or just ping <@745140889755844680>. \n\nIf you have any questions or need help with Bunch, [click here](https://discord.gg/WkJGTekDZp) to join our support server!')
+      .setColor("RANDOM")
+      )
+    })
 
-  if (welcomeMsgSettings.status == 'no') return;
-
-  if (welcomeMsgSettings.status == 'yes') {
-    var applyText = (canvas, text) => {
-      const ctx = canvas.getContext('2d');
-      let fontSize = 70;
-
-      do {
-        ctx.font = `${(fontSize -= 10)}px Open Sans Light`; // This needs to match the family Name on line 65
-      } while (ctx.measureText(text).width > canvas.width - 300);
-
-      return ctx.font;
-    };
-
-    // Customizable Welcome Image Options
-    var canvas = await Canvas.createCanvas(
-      welcomeMsgSettings.imageWidth,
-      welcomeMsgSettings.imageHeight
-    );
-    var ctx = canvas.getContext('2d');
-
-    // Background Image Options
-    var background = await Canvas.loadImage(welcomeMsgSettings.wallpaperURL);
-    ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-
-    // Background Image Border Options
-    ctx.strokeStyle = '#000000';
-    ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
-    // Upper Text Options Default
-    if (welcomeMsgSettings.topImageText == 'default') {
-      ctx.font = '26px Open Sans Light'; // This needs to match the family Name on line 65
-      ctx.fillStyle = '#FFFFFF'; // Main Color of the Text on the top of the welcome image
-      ctx.fillText(
-        `Welcome to ${member.guild.name}`, //<-- didn't play nice being stored in DB -Default
-        canvas.width / 2.5,
-        canvas.height / 3.5
-      );
-      ctx.strokeStyle = `#FFFFFF`; // Secondary Color of Text on the top of welcome for depth/shadow the stroke is under the main color
-      ctx.strokeText(
-        `Welcome to ${member.guild.name}`, //<-- didn't play nice being stored in DB -Default
-        canvas.width / 2.5,
-        canvas.height / 3.5
-      );
-    } else {
-      // Upper Text Options DB
-      ctx.font = '26px Open Sans Light'; // if the font register changed this needs to match the family Name on line 65
-      ctx.fillStyle = '#FFFFFF'; // Main Color of the Text on the top of the welcome image
-      ctx.fillText(
-        welcomeMsgSettings.topImageText,
-        canvas.width / 2.5,
-        canvas.height / 3.5
-      );
-      ctx.strokeStyle = `#FFFFFF`; // Secondary Color of Text on the top of welcome for depth/shadow the stroke is under the main color
-      ctx.strokeText(
-        welcomeMsgSettings.topImageText,
-        canvas.width / 2.5,
-        canvas.height / 3.5
-      );
-    }
-
-    // Lower Text Options Defaults
-    if (welcomeMsgSettings.bottomImageText == 'default') {
-      ctx.font = applyText(canvas, `${member.displayName}!`);
-      ctx.fillStyle = '#FFFFFF'; // Main Color for the members name for the welcome image
-      ctx.fillText(
-        `${member.displayName}!`, //<-- didn't play nice being stored in DB -Default
-        canvas.width / 2.5,
-        canvas.height / 1.8
-      );
-      ctx.strokeStyle = `#FF0000`; // Secondary Color for the member name to add depth/shadow to the text
-      ctx.strokeText(
-        `${member.displayName}!`, //<-- didn't play nice being stored in DB -Default
-        canvas.width / 2.5,
-        canvas.height / 1.8
-      );
-    } else {
-      //Lower Text Options DB
-      ctx.font = applyText(canvas, `${member.displayName}!`);
-      ctx.fillStyle = '#FFFFFF'; // Main Color for the members name for the welcome image
-      ctx.fillText(
-        welcomeMsgSettings.bottomImageText,
-        canvas.width / 2.5,
-        canvas.height / 1.8
-      );
-      ctx.strokeStyle = `#FF0000`; // Secondary Color for the member name to add depth/shadow to the text
-      ctx.strokeText(
-        welcomeMsgSettings.bottomImageText,
-        canvas.width / 2.5,
-        canvas.height / 1.8
-      );
-    }
-
-    // Avatar Shape Options
-    ctx.beginPath();
-    ctx.arc(125, 125, 100, 0, Math.PI * 2, true); // Shape option (circle)
-    ctx.closePath();
-    ctx.clip();
-
-    const avatar = await Canvas.loadImage(
-      member.user.displayAvatarURL({
-        format: 'jpg'
+    client.on('message', async message => {
+      const args = message.content.substring(prefix.length).split(" ")
+      if (message.content.startsWith(`${prefix}help`)) {
+        const embed = new Discord.MessageEmbed()
+          .setColor('RANDOM')
+          .setTitle('Bunch Help')
+          .setURL('https://docs.google.com/document/d/1cRUb67XddISl5qJEl4ag5aOAyMEHNBC9w_3t2LFvXrk/edit?usp=sharing')
+          .setThumbnail('https://media.discordapp.net/attachments/761909300405731379/782307760737353738/20201129-015404-unscreen_1.gif')
+          .addField('<a:786905733488574484:787128851993591828> My commands?','<a:772160779754536960:784570752447938620> Ping <@745140889755844680> or `/bunch` to see my __[Commands](https://docs.google.com/document/d/1cRUb67XddISl5qJEl4ag5aOAyMEHNBC9w_3t2LFvXrk/edit?usp=sharing)__')
+          .addField('<a:786905733488574484:787128851993591828> Invite Bunch?','<a:4745_thisr:784567429866455071> [Click me](https://discord.com/oauth2/authorize?client_id=745140889755844680&scope=bot&permissions=3525704) or `/invite`')
+          .addField('<a:786905733488574484:787128851993591828> Need help?','<a:4745_thisr:784567429866455071> Official Discord Server: __[Join](https://discord.gg/WkJGTekDZp)__')
+          .setImage('https://media.discordapp.net/attachments/601060403941736460/702530987598413864/Tw.gif')
+          .setFooter('Bunch', 'https://images-ext-1.discordapp.net/external/beJMZyOk5ipOYZYWXS_88TdmtKMYE9GFWZ1_EvsLIys/https/media.discordapp.net/attachments/781434598617120778/787749668045848636/20201213_174419.gif')
+          .setTimestamp()
+          message.channel.send(embed)
+        }
       })
-    );
-    ctx.drawImage(avatar, 25, 25, 200, 200);
-    // Image is Built and Ready
-    const attachment = new MessageAttachment(
-      canvas.toBuffer(),
-      'welcome-image.png'
-    );
 
-    // Welcome Embed Report
-    var embed = new MessageEmbed()
-      .setColor(`RANDOM`)
-      .attachFiles(attachment)
-      .setImage('attachment://welcome-image.png')
-      .setFooter(`Type help for a feature list!`)
-      .setTimestamp();
-    if (welcomeMsgSettings.embedTitle == 'default') {
-      embed.setTitle(
-        `:speech_balloon: Hey ${member.displayName}, You look new to ${member.guild.name}!` //<-- didn't play nice being stored in DB -Default
-      );
-    } else embed.setTitle(welcomeMsgSettings.embedTitle);
+            client.on('message', async message => {
+              const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+              const prefixRegex = new RegExp(`^(<@!?${client.user.id}>)\\s*`);
+              if (!prefixRegex.test(message.content)) return;
+                const embed = new Discord.MessageEmbed()
+                .setColor('RANDOM')
+                .setTitle('Bunch Commands')
+                .setURL('https://docs.google.com/document/d/1cRUb67XddISl5qJEl4ag5aOAyMEHNBC9w_3t2LFvXrk/edit?usp=sharing')
+                .setThumbnail('https://media.discordapp.net/attachments/781434598617120778/787749668045848636/20201213_174419.gif')
+                .addField('<a:772308797842128897:786918359605444618> Music Play', '`/play` `/pause` `/resume` `/now-playing` `/leave` `/volume` `/queue` `/remove` `/lyrics` `/join` `/shuffle` `/skip` `/skipall` `/skipto` `/move` `/loop` `/loopqueue`')
+                .addField('<a:772308797842128897:786918359605444618> Music Playlist', '`/create-playlist` `/my-playlists` `/delete-playlist` `/display-playlist` `/remove-from-playlist` `/save-to-playlist`')
+                .addField('<a:772308797842128897:786918359605444618> Music Quiz', '`/music-trivia` `/stop-trivia`')
+                .addField('<a:734088088648679445:808730284811616316> Games', '`/chess` `/snake` `/hangman` `/connect4`')
+                .addField('<a:587566059855282196:806942542787903578> Extras', '`/status` `/bunch` `/help` `/ping` `/invite` `/support` `/paypal` `/feedback`')
+                .setFooter('Join our Discord Server now! Link: https://discord.gg/WkJGTekDZp')
+                .setImage('https://media.discordapp.net/attachments/601060403941736460/702530987598413864/Tw.gif')
+                message.channel.send(embed)
+              
+            })
 
-    // Sends a DM if set to or if destination is not present in DB(pre channel option users)
-    if (
-      welcomeMsgSettings.destination == 'direct message' ||
-      !welcomeMsgSettings.destination
-    )
-      try {
-        await member.user.send(embed);
-      } catch {
-        console.log(`${member.user.username}'s dms are private`);
-      }
+            client.on('message', async message => {
+              const args = message.content.substring(prefix.length).split(" ")
+              if (message.content.startsWith(`${prefix}bunch`)) {
+                const embed = new Discord.MessageEmbed()
+                .setColor('RANDOM')
+                .setTitle('Bunch Commands')
+                .setURL('https://docs.google.com/document/d/1cRUb67XddISl5qJEl4ag5aOAyMEHNBC9w_3t2LFvXrk/edit?usp=sharing')
+                .setThumbnail('https://media.discordapp.net/attachments/781434598617120778/787749668045848636/20201213_174419.gif')
+                .addField('<a:772308797842128897:786918359605444618> Music Play', '`/play` `/pause` `/resume` `/now-playing` `/leave` `/volume` `/queue` `/remove` `/lyrics` `/join` `/shuffle` `/skip` `/skipall` `/skipto` `/move` `/loop` `/loopqueue`')
+                .addField('<a:772308797842128897:786918359605444618> Music Playlist', '`/create-playlist` `/my-playlists` `/delete-playlist` `/display-playlist` `/remove-from-playlist` `/save-to-playlist`')
+                .addField('<a:772308797842128897:786918359605444618> Music Quiz', '`/music-trivia` `/stop-trivia`')
+                .addField('<a:734088088648679445:808730284811616316> Games', '`/chess` `/snake` `/hangman` `/connect4`')
+                .addField('<a:587566059855282196:806942542787903578> Extras', '`/status` `/bunch` `/help` `/ping` `/invite` `/support` `/paypal` `/feedback`')
+                .setFooter('Join our Discord Server now! Link: https://discord.gg/WkJGTekDZp')
+                .setImage('https://media.discordapp.net/attachments/601060403941736460/702530987598413864/Tw.gif')
+                message.channel.send(embed)
+              }
+            })
 
-    // Sends to assigned Channel from DB
-    if (welcomeMsgSettings.destination != 'direct message') {
-      const channel = member.guild.channels.cache.find(
-        channel => channel.name === welcomeMsgSettings.destination
-      );
-      await channel.send(`${member}`);
-      await channel.send(embed);
-    }
-  }
-});
+            client.on('message', async message => {
+              const args = message.content.substring(prefix.length).split(" ")
+              if (message.content.startsWith(`${prefix}paypal`)) {
+                const embed = new Discord.MessageEmbed()
+                  .setColor('RANDOM')
+                  .setTitle('Want to support me for my development?')
+                  .setURL('https://www.paypal.me/jriskam')
+                  .setDescription('<a:741402474098851841:797871278194819072> Every cents count! All donations will be used in the Development of Bunch. Do drop a note of your Discord Username, so that i can thank you! \nhttps://www.paypal.me/jriskam')
+                  .setFooter('Bunch', 'https://media.discordapp.net/attachments/781434598617120778/782262504617148486/PicsArt_11-28-11.01.00.png?width=669&height=667')
+                  message.channel.send(embed)
+                
+              }
+            })
+
+            client.on('message', async message => {
+              const args = message.content.substring(prefix.length).split(" ")
+              if (message.content.startsWith(`${prefix}support`)) {
+                const embed = new Discord.MessageEmbed()
+                  .setColor('RANDOM')
+                  .setTitle('Want to join our Discord Server?')
+                  .setURL('https://discord.gg/WkJGTekDZp')
+                  .setDescription('<a:786905733488574484:787128851993591828> [Click me](https://www.discord.gg/WkJGTekDZp)')
+                  .setFooter('Bunch', 'https://media.discordapp.net/attachments/781434598617120778/782262504617148486/PicsArt_11-28-11.01.00.png?width=669&height=667')
+                  message.channel.send(embed)
+                
+              }
+            })
+
+            client.on('message', async message => {
+              const args = message.content.substring(prefix.length).split(" ")
+              if (message.content.startsWith(`${prefix}feedback`)) {
+                const embed = new Discord.MessageEmbed()
+                  .setColor('RANDOM')
+                  .setDescription(`**<a:778203523896573952:797926225284431922> Hey <@${message.author.id}>, leave some suggestions & feedbacks for us? Click the link below** \nhttps://forms.gle/hpDnjSpjWHsPku779`)
+                  .setFooter('Bunch', 'https://media.discordapp.net/attachments/781434598617120778/782262504617148486/PicsArt_11-28-11.01.00.png?width=669&height=667')
+                  message.channel.send(embed)
+                
+              }
+            })
+
+            client.on('message', async message => {
+              const args = message.content.substring(prefix.length).split(" ")
+              if (message.content.startsWith(`${prefix}lyrics`)) {
+                const embed = new Discord.MessageEmbed()
+                  .setColor('RANDOM')
+                  .setDescription(`**<a:778203523896573952:797926225284431922> Hey <@${message.author.id}>, __/lyrics__ is still currently under observation. For more info, please join our [Discord Server](https://www.discord.gg/WkJGTekDZp).**`)
+                  .setFooter('Bunch', 'https://media.discordapp.net/attachments/781434598617120778/782262504617148486/PicsArt_11-28-11.01.00.png?width=669&height=667')
+                  message.channel.send(embed)
+                
+              }
+            })
+
+            client.on('message', msg => {
+                  if (msg.content.toLowerCase() === '/snake') {
+                      snakeGame.newGame(msg);
+                  }
+                  else if (msg.content.toLowerCase() === '/hangman') {
+                      hangman.newGame(msg);
+                  }
+                  else if (msg.content.toLowerCase() === '/connect4') {
+                      connect4.newGame(msg);
+                  }
+                  else if (msg.content.toLowerCase() === '/chess') {
+                      chess.newGame(msg);
+              }
+            })
+            
+
+
 
 client.login(token);

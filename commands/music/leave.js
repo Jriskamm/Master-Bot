@@ -26,6 +26,7 @@ module.exports = class LeaveCommand extends Command {
         message.guild.me.voice.channel
       ) {
         message.guild.me.voice.channel.leave();
+        message.react(`👌`);
       } else {
         message.reply(':x: There is no song playing right now!');
       }
@@ -50,20 +51,14 @@ module.exports = class LeaveCommand extends Command {
       setTimeout(() => {
         message.guild.musicData.songDispatcher.end();
       }, 100);
-      message.reply(
-        `:grey_exclamation: ${this.client.user.username} has left the channel.`
-      );
-      return;
+      message.react(`👋`);
     } else {
       message.guild.musicData.queue.length = 0;
       message.guild.musicData.skipTimer = true;
       message.guild.musicData.loopSong = false;
       message.guild.musicData.loopQueue = false;
       message.guild.musicData.songDispatcher.end();
-      message.reply(
-        `:grey_exclamation: ${this.client.user.username} has left the channel.`
-      );
-      return;
+      message.react(`👋`);
     }
   }
 };

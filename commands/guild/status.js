@@ -6,9 +6,9 @@ const pkg = require('../../package.json');
 module.exports = class BotStatusCommand extends Command {
   constructor(client) {
     super(client, {
-      name: 'bot-status',
+      name: 'status',
       group: 'other',
-      memberName: 'bot-status',
+      memberName: 'status',
       description: 'Shows the current system status'
     });
   }
@@ -34,10 +34,7 @@ module.exports = class BotStatusCommand extends Command {
     const used = process.memoryUsage().heapUsed / 1024 / 1024;
 
     let totalSeconds = process.uptime();
-    let realTotalSecs = Math.floor(totalSeconds % 60);
-    let days = Math.floor((totalSeconds % 31536000) / 86400);
-    let hours = Math.floor((totalSeconds / 3600) % 24);
-    let mins = Math.floor((totalSeconds / 60) % 60);
+
 
     const guildCacheMap = this.client.guilds.cache;
     const guildCacheArray = Array.from(guildCacheMap, ([name, value]) => ({
@@ -51,15 +48,10 @@ module.exports = class BotStatusCommand extends Command {
 
     const StatusEmbed = new Discord.MessageEmbed()
       .setThumbnail(this.client.user.displayAvatarURL())
-      .setTitle(`Status of ${this.client.user.username}`)
+      .setTitle(`${this.client.user.username} Status`)
       .setColor('#ff0000')
       .addField(`Memory usage`, `${Math.round(used * 100) / 100}MB`, true)
-      .addField(
-        `Uptime`,
-        `${days} D 
-         ${hours} H : ${mins} M : ${realTotalSecs} S`,
-        true
-      )
+
       .addField(`Platform`, `${platform} ${archInfo}`, true)
       .addField('Operated By', this.client.owners)
 
@@ -69,14 +61,10 @@ module.exports = class BotStatusCommand extends Command {
         true
       )
       .addField(
-        'Servers, Users',
-        `On ${this.client.guilds.cache.size} servers, with a total of ${memberCount} users.`
+        'About Me',
+        `Hey! I'm Bunch <:Bunch:782263094008872981>, an Advanced Music Bot. I'm currently in ${this.client.guilds.cache.size} servers.`
       )
-      .addField(
-        'Dependency List',
-        `node: ${process.version.replace(/v/, '')}
-        ${libList}`
-      )
+
       .setFooter('Created', this.client.user.avatarURL())
       .setTimestamp(this.client.user.createdAt);
 

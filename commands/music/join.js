@@ -30,7 +30,7 @@ module.exports = class JoinCommand extends Command {
     }
     try {
       await voiceChannel.join();
-      return;
+      message.react(`👌`);;
     } catch {
       message.reply(
         ':x Something went wrong while attempting to move channels'

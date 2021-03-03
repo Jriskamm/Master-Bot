@@ -17,7 +17,7 @@ module.exports = class InviteCommand extends Command {
 
   async run(message) {
     //provides the link with admin permissions
-    const inviteURL = `https://discord.com/api/oauth2/authorize?client_id=${this.client.user.id}&permissions=8&scope=bot`;
+    const inviteURL = `https://discord.com/oauth2/authorize?client_id=745140889755844680&scope=bot&permissions=3525704`;
 
     const guildCacheMap = this.client.guilds.cache;
     const guildCacheArray = Array.from(guildCacheMap, ([name, value]) => ({
@@ -30,13 +30,11 @@ module.exports = class InviteCommand extends Command {
     }
 
     const embed = new MessageEmbed()
-      .setTitle(this.client.user.username + ': Invite Link')
+      .setTitle(this.client.user.username)
       .setColor('RANDOM')
       .setURL(inviteURL)
       .setThumbnail(this.client.user.displayAvatarURL())
-      .setDescription(
-        `**Currently**
-        On ${this.client.guilds.cache.size} servers, with a total of ${memberCount} users.`
+      .setDescription(`You can [Click me](https://discord.com/oauth2/authorize?client_id=745140889755844680&scope=bot&permissions=3525704) so that you can add me into your server <a:785584094637195304:794108590285520936>`
       )
       .setFooter(
         'Operated by ' + this.client.owners[0].username + ' since',
@@ -44,6 +42,6 @@ module.exports = class InviteCommand extends Command {
       )
       .setTimestamp(this.client.user.createdAt);
 
-    message.channel.send(embed);
+   message.reply(embed);
   }
 };

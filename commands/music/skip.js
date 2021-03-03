@@ -37,5 +37,6 @@ module.exports = class SkipCommand extends Command {
     }
     message.guild.musicData.loopSong = false;
     message.guild.musicData.songDispatcher.end();
+    message.react(`👌`);
   }
 };

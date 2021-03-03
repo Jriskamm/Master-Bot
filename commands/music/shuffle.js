@@ -13,17 +13,16 @@ module.exports = class ShuffleQueueCommand extends Command {
   }
   run(message) {
     var voiceChannel = message.member.voice.channel;
-    if (!voiceChannel) {
-      message.reply(':no_entry: Please join a voice channel and try again!');
-      return;
-    }
+    if (!voiceChannel)
+      return message.reply(
+        ':no_entry: Please join a voice channel and try again!'
+      );
 
     if (
       typeof message.guild.musicData.songDispatcher == 'undefined' ||
       message.guild.musicData.songDispatcher == null
     ) {
-      message.reply(':x: There is nothing playing right now!');
-      return;
+      return message.reply(':x: There is no song playing right now!');
     } else if (voiceChannel.id !== message.guild.me.voice.channel.id) {
       message.reply(
         `:no_entry: You must be in the same voice channel as the bot's in order to use that!`
@@ -35,10 +34,8 @@ module.exports = class ShuffleQueueCommand extends Command {
       );
       return;
     }
-    if (message.guild.musicData.queue.length < 1) {
-      message.reply(':x: There are no songs in queue!');
-      return;
-    }
+    if (message.guild.musicData.queue.length < 1)
+      returnmessage.reply(':x: There are no songs in queue!');
 
     shuffleQueue(message.guild.musicData.queue);
 
