@@ -215,11 +215,11 @@ client.on('guildCreate', guild => {
             client.on('message', async message => {
               const args = message.content.substring(prefix.length).split(" ")
               if (message.content.startsWith(`${prefix}lyrics`)) {
-                const embed = new Discord.MessageEmbed()
+                message.reply(new Discord.MessageEmbed()
                   .setColor('RANDOM')
-                  .setDescription(`**<a:778203523896573952:797926225284431922> Hey <@${message.author.id}>, __/lyrics__ is still currently under observation. For more info, please join our [Discord Server](https://www.discord.gg/WkJGTekDZp).**`)
-                  .setFooter('Bunch', 'https://media.discordapp.net/attachments/781434598617120778/782262504617148486/PicsArt_11-28-11.01.00.png?width=669&height=667')
-                  message.channel.send(embed)
+                  .addField(`<:9636_Cross:780079345178902608> Command Locked`, `\`/lyrics\` has been disabled temporarily.`)
+                  .setFooter('Bunch', 'https://media.discordapp.net/attachments/781434598617120778/782262504617148486/PicsArt_11-28-11.01.00.png?width=669&height=667'));
+
                 
               }
             })

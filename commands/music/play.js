@@ -331,7 +331,8 @@ module.exports = class PlayCommand extends Command {
             }
           })
           .on('error', function(e) {
-           message.reply(':x: Cannot play song!');
+           message.reply(new Discord.MessageEmbed()
+           .addField('<:6175_among_us_report:780017540599382036> I\'m unable to play song!', 'Please join our [Discord Server](https://discord.gg/WkJGTekDZp) to report this issue.'));
             console.error(e);
             if (queue.length > 1) {
               queue.shift();
