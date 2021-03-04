@@ -32,6 +32,7 @@ module.exports = class InviteCommand extends Command {
     const embed = new MessageEmbed()
       .setTitle(this.client.user.username)
       .setColor('RANDOM')
+      .setImage('https://images-ext-2.discordapp.net/external/onJIE1enNij8oh8MOcP9o7Ds3lN2jKU7pWZsPOxqUHA/https/media.discordapp.net/attachments/601060403941736460/702530987598413864/Tw.gif')
       .setURL(inviteURL)
       .setThumbnail(this.client.user.displayAvatarURL())
       .setDescription(`You can [Click me](https://discord.com/oauth2/authorize?client_id=745140889755844680&scope=bot&permissions=3525704) so that you can add me into your server <a:785584094637195304:794108590285520936>`

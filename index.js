@@ -67,8 +67,8 @@ client.registry
 
 client.once('ready', () => {
   console.log(`${client.user.tag} is connected to Discord successfully!`);
-  client.user.setActivity(`${prefix}help`, {
-    type: 'STREAMING',
+  client.user.setActivity(`@Bunch`, {
+    type: 'LISTENING',
     url: 'https://www.twitch.tv/jriskam'
   });
 });
@@ -110,52 +110,15 @@ client.on('guildCreate', guild => {
 
       channel.send(new Discord.MessageEmbed()
       .setTitle("Thanks for adding me into your server!!")
-      .addField('**_Bunch Discord Bot_** <:Bunch:782263094008872981>','To get started, join a voice channel and `/play` a song! You can use song names, video links, and playlist links. A full list of commands is available [here](https://docs.google.com/document/d/1cRUb67XddISl5qJEl4ag5aOAyMEHNBC9w_3t2LFvXrk/edit?usp=sharing) or just ping <@745140889755844680>. \n\nIf you have any questions or need help with Bunch, [click here](https://discord.gg/WkJGTekDZp) to join our support server!')
+      .addField('**_Bunch Discord Bot_** <:Bunch:782263094008872981>','To get started, join a voice channel and `/play` a song! You can use song names, video links, and playlist links. A full list of commands is available [here](https://docs.google.com/document/d/1cRUb67XddISl5qJEl4ag5aOAyMEHNBC9w_3t2LFvXrk/edit?usp=sharing) or by typing the command: `/help`. \n\nIf you have any questions or need help with Bunch, [click here](https://discord.gg/WkJGTekDZp) to join our support server')
       .setColor("RANDOM")
       )
     })
 
-    client.on('message', async message => {
-      const args = message.content.substring(prefix.length).split(" ")
-      if (message.content.startsWith(`${prefix}help`)) {
-        const embed = new Discord.MessageEmbed()
-          .setColor('RANDOM')
-          .setTitle('Bunch Help')
-          .setURL('https://docs.google.com/document/d/1cRUb67XddISl5qJEl4ag5aOAyMEHNBC9w_3t2LFvXrk/edit?usp=sharing')
-          .setThumbnail('https://media.discordapp.net/attachments/761909300405731379/782307760737353738/20201129-015404-unscreen_1.gif')
-          .addField('<a:786905733488574484:787128851993591828> My commands?','<a:772160779754536960:784570752447938620> Ping <@745140889755844680> or `/bunch` to see my __[Commands](https://docs.google.com/document/d/1cRUb67XddISl5qJEl4ag5aOAyMEHNBC9w_3t2LFvXrk/edit?usp=sharing)__')
-          .addField('<a:786905733488574484:787128851993591828> Invite Bunch?','<a:4745_thisr:784567429866455071> [Click me](https://discord.com/oauth2/authorize?client_id=745140889755844680&scope=bot&permissions=3525704) or `/invite`')
-          .addField('<a:786905733488574484:787128851993591828> Need help?','<a:4745_thisr:784567429866455071> Official Discord Server: __[Join](https://discord.gg/WkJGTekDZp)__')
-          .setImage('https://media.discordapp.net/attachments/601060403941736460/702530987598413864/Tw.gif')
-          .setFooter('Bunch', 'https://images-ext-1.discordapp.net/external/beJMZyOk5ipOYZYWXS_88TdmtKMYE9GFWZ1_EvsLIys/https/media.discordapp.net/attachments/781434598617120778/787749668045848636/20201213_174419.gif')
-          .setTimestamp()
-          message.channel.send(embed)
-        }
-      })
-
-            client.on('message', async message => {
-              const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-              const prefixRegex = new RegExp(`^(<@!?${client.user.id}>)\\s*`);
-              if (!prefixRegex.test(message.content)) return;
-                const embed = new Discord.MessageEmbed()
-                .setColor('RANDOM')
-                .setTitle('Bunch Commands')
-                .setURL('https://docs.google.com/document/d/1cRUb67XddISl5qJEl4ag5aOAyMEHNBC9w_3t2LFvXrk/edit?usp=sharing')
-                .setThumbnail('https://media.discordapp.net/attachments/781434598617120778/787749668045848636/20201213_174419.gif')
-                .addField('<a:772308797842128897:786918359605444618> Music Play', '`/play` `/pause` `/resume` `/now-playing` `/leave` `/volume` `/queue` `/remove` `/lyrics` `/join` `/shuffle` `/skip` `/skipall` `/skipto` `/move` `/loop` `/loopqueue`')
-                .addField('<a:772308797842128897:786918359605444618> Music Playlist', '`/create-playlist` `/my-playlists` `/delete-playlist` `/display-playlist` `/remove-from-playlist` `/save-to-playlist`')
-                .addField('<a:772308797842128897:786918359605444618> Music Quiz', '`/music-trivia` `/stop-trivia`')
-                .addField('<a:734088088648679445:808730284811616316> Games', '`/chess` `/snake` `/hangman` `/connect4`')
-                .addField('<a:587566059855282196:806942542787903578> Extras', '`/status` `/bunch` `/help` `/ping` `/invite` `/support` `/paypal` `/feedback`')
-                .setFooter('Join our Discord Server now! Link: https://discord.gg/WkJGTekDZp')
-                .setImage('https://media.discordapp.net/attachments/601060403941736460/702530987598413864/Tw.gif')
-                message.channel.send(embed)
-              
-            })
 
             client.on('message', async message => {
               const args = message.content.substring(prefix.length).split(" ")
-              if (message.content.startsWith(`${prefix}bunch`)) {
+              if (message.content.startsWith(`${prefix}help`)) {
                 const embed = new Discord.MessageEmbed()
                 .setColor('RANDOM')
                 .setTitle('Bunch Commands')
@@ -165,7 +128,7 @@ client.on('guildCreate', guild => {
                 .addField('<a:772308797842128897:786918359605444618> Music Playlist', '`/create-playlist` `/my-playlists` `/delete-playlist` `/display-playlist` `/remove-from-playlist` `/save-to-playlist`')
                 .addField('<a:772308797842128897:786918359605444618> Music Quiz', '`/music-trivia` `/stop-trivia`')
                 .addField('<a:734088088648679445:808730284811616316> Games', '`/chess` `/snake` `/hangman` `/connect4`')
-                .addField('<a:587566059855282196:806942542787903578> Extras', '`/status` `/bunch` `/help` `/ping` `/invite` `/support` `/paypal` `/feedback`')
+                .addField('<a:587566059855282196:806942542787903578> Extras', '`/help` `/ping` `/invite` `/support` `/paypal` `/feedback`')
                 .setFooter('Join our Discord Server now! Link: https://discord.gg/WkJGTekDZp')
                 .setImage('https://media.discordapp.net/attachments/601060403941736460/702530987598413864/Tw.gif')
                 message.channel.send(embed)
@@ -193,7 +156,8 @@ client.on('guildCreate', guild => {
                   .setColor('RANDOM')
                   .setTitle('Want to join our Discord Server?')
                   .setURL('https://discord.gg/WkJGTekDZp')
-                  .setDescription('<a:786905733488574484:787128851993591828> [Click me](https://www.discord.gg/WkJGTekDZp)')
+                  .setImage('https://images-ext-2.discordapp.net/external/onJIE1enNij8oh8MOcP9o7Ds3lN2jKU7pWZsPOxqUHA/https/media.discordapp.net/attachments/601060403941736460/702530987598413864/Tw.gif')
+                  .setDescription('<a:786905733488574484:787128851993591828> [Click me](https://www.discord.gg/WkJGTekDZp) to join!')
                   .setFooter('Bunch', 'https://media.discordapp.net/attachments/781434598617120778/782262504617148486/PicsArt_11-28-11.01.00.png?width=669&height=667')
                   message.channel.send(embed)
                 
@@ -238,6 +202,25 @@ client.on('guildCreate', guild => {
                       chess.newGame(msg);
               }
             })
+
+            client.on('message', async message => {
+              const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+              const prefixRegex = new RegExp(`^(<@!?${client.user.id}>)\\s*`);
+              if (!prefixRegex.test(message.content)) return;
+                const exampleEmbed = new Discord.MessageEmbed()
+	.setColor('RANDOM')
+	.setAuthor('Bunch Music Bot', 'https://cdn.discordapp.com/emojis/782263094008872981.png?v=1')
+  .setDescription('To get started, join a voice channel and `/play` a song! You can use song names, video links, and playlist links. A full list of commands is available [here](https://docs.google.com/document/d/1cRUb67XddISl5qJEl4ag5aOAyMEHNBC9w_3t2LFvXrk/edit?usp=sharing) or by typing the command: `/help` \n\nIf you have any questions or need help with Bunch, [click here](https://discord.gg/WkJGTekDZp) to join our support server!')
+	.setThumbnail('https://images-ext-1.discordapp.net/external/GfVIM-trVSpGFjwNnIXwLv-cGieXM6i6euaKElC6DEs/https/media.discordapp.net/attachments/761909300405731379/782307760737353738/20201129-015404-unscreen_1.gif')
+	.setImage('https://images-ext-1.discordapp.net/external/zEfK8c0ho_q4PvqHuFLl8QTVuEpattu5yg2RZmVOxUA/https/images-ext-2.discordapp.net/external/onJIE1enNij8oh8MOcP9o7Ds3lN2jKU7pWZsPOxqUHA/https/media.discordapp.net/attachments/601060403941736460/702530987598413864/Tw.gif')
+	.setFooter('© 2021 Bunch Co.','https://images-ext-1.discordapp.net/external/beJMZyOk5ipOYZYWXS_88TdmtKMYE9GFWZ1_EvsLIys/https/media.discordapp.net/attachments/781434598617120778/787749668045848636/20201213_174419.gif');
+
+message.channel.send(exampleEmbed);
+                
+              
+            })
+
+
             
 
 
